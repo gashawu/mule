@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c196c6d5-b645-4a28-9b61-984d0db364af" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="7a9d6b72-4acf-49cd-b661-858c1732b57a" >
+		<db:oracle-connection host="localhost" user="system" password="gebuta123" />
+	</db:config>
+	<flow name="select-cityFlow" doc:id="8f1443a8-4aa6-4ed5-a71d-599301c397b3" >
+		<http:listener doc:name="Entery Listener" doc:id="f1222277-6e31-42e6-aa0c-062c7263ee1c" config-ref="HTTP_Listener_config" path="/select"/>
+		<db:select doc:name="Select " doc:id="1d6197d5-5781-4a17-86dd-f4c3b2cd006d" config-ref="Database_Config">
+			<db:sql >select * from sale where city =Aaronsburg</db:sql>
+		</db:select>
+	</flow>
+</mule>
