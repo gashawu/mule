@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bb5d3fd7-ebd6-4173-854e-364bf5c184c2" >
+		<http:listener-connection host="0.0.0.0" port="8083" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="cf720d0f-e846-421a-9a00-440cebdcc212" >
+		<file:connection workingDir="C:\AAF\in" />
+	</file:config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="14c8f58a-faca-4e0c-b228-40db0de9970e" maxEntries="1" entryTtl="25" expirationInterval="15" expirationIntervalUnit="SECONDS" />
+	<flow name="objetstoreFlow" doc:id="fdfd05d6-89ae-4ed2-80f0-0147031c7f11" >
+		<http:listener doc:name="Listener" doc:id="90d8c564-cca0-4f18-b5d5-46070dfad5aa" config-ref="HTTP_Listener_config" path="/store"/>
+		<os:store doc:name="Store" doc:id="c3c62bd6-cae9-40f0-84a5-424bfcd6d29e" key="inputmsg1" objectStore="Object_store"/>
+		<set-payload value="#['the inputmsg has been stored into object store: the key value is inputmsg']" doc:name="Set Payload" doc:id="ec57acef-5d5d-40dd-b7f0-08206f196849" />
+	</flow>
+	<flow name="objetstoreFlow1" doc:id="dbc102ee-76f1-468f-a94b-39bfd7e24eae" >
+		<http:listener doc:name="Listener" doc:id="812b7bcf-1053-474f-a0eb-5ae05093fa29" config-ref="HTTP_Listener_config" path="/req"/>
+		<os:retrieve doc:name="Retrieve" doc:id="350bd175-cd31-4a59-9b5a-9eefc68d01d9" key="inputmsg1" objectStore="Object_store">
+			<os:default-value ><![CDATA[#['empty value']]]></os:default-value>
+		</os:retrieve>
+		<ee:transform doc:name="Transform Message" doc:id="c4fccd63-0b00-4356-808f-72c9e49728b6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="objetstoreFlow2" doc:id="cd733907-5484-451d-9d5c-18bb19f50249" >
+		<http:listener doc:name="Listener" doc:id="970589ca-7444-4e80-bbde-d9b9c93ccb1a" config-ref="HTTP_Listener_config" path="/cle"/>
+		<os:clear doc:name="Clear" doc:id="41673770-68b9-4a33-a9bd-e007a22289d4" objectStore="Object_store"/>
+	</flow>
+	<flow name="objetstoreFlow3" doc:id="f485d919-7eb1-4886-9bdc-a6bcc0a75c91" >
+		<http:listener doc:name="Listener" doc:id="2c08035e-75ec-4dec-b10f-ad08f86ae738" config-ref="HTTP_Listener_config" path="/all"/>
+		<os:retrieve-all doc:name="Retrieve all" doc:id="7e6bd801-7397-4459-8997-dda0c6c99d5c" objectStore="Object_store"/>
+		<ee:transform doc:name="Transform Message" doc:id="79b3a40f-4ab2-4838-ae81-c7f56b8136fa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
